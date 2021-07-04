@@ -1,0 +1,23 @@
+<html>
+<body>
+<h1>Paarungen</h1>
+
+<style type="text/css">
+    customers tr:nth-child(even){background-color: #f2f200;};
+    customers tr:hover {background-color: #ddd;};
+  </style>
+<table border="2">
+    <tr>
+        <th>Person A</th>
+        <th>Person B</th>
+    </tr>
+    {% for entry in object_list %}
+    <tr>
+        <td>{{ entry.personA }}</td>
+        <td>{{ entry.personB }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+
+</html>
