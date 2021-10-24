@@ -10,11 +10,13 @@
     <tr>
         <th>Person A</th>
         <th>Person B</th>
+        <th>Bisherige Vorkommen</th>
     </tr>
     {% for entry in object_list %}
     <tr>
         <td>{{ entry.personA }}</td>
         <td>{{ entry.personB }}</td>
+        <td>{{ entry.repeate }}</td>
     </tr>
     {% endfor %}
 </table>

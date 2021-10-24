@@ -5,6 +5,7 @@ from .forms import CreatRaffleForm
 from django.views import generic
 from datetime import datetime
 from django.db.models import Q
+from django.db.models import Count
 
 import random
 from .models import *
@@ -49,4 +50,12 @@ class ListRaffleView(generic.ListView):
         object_list.extend(list(Pairing.objects.filter(
                 Q(event=query)
         )))
+
+        for entry in object_list:
+
+            entry.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=entry.personB).count()
+            entry.repeate += Pairing.objects.all().filter(personA=entry.personB, personB=entry.personA).count()
+            entry.repeate -= 1
+            print(entry)
+
         return object_list
