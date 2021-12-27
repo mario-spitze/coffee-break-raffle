@@ -19,5 +19,7 @@ class Pairing(models.Model):
     personA = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='personA')
     personB = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='personB')
 
+    cleaning_task = models.BooleanField(default = False)
+
     def __str__(self):
         return self.event.__str__() + " => " + self.personA.__str__() + " - " + self.personB.__str__()
