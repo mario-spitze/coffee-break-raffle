@@ -41,10 +41,22 @@ def createRaffle(request):
 class ListRaffleView(generic.ListView):
     template_name = 'raffle/listEntry.html'
 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        showSum = self.request.GET.get('showSum')
+        if showSum == '1':
+            context['showSum'] = '1'
+        return context
+        
+
     def get_queryset(self): # new
         object_list = []
         pk_url_kwarg = "post_id"
         query = self.kwargs['id']
+
+        
 
 #        all_queryset = QuerySet.create(list(chain(Site.objects.all(), Medium.objects.all())))
         object_list.extend(list(Pairing.objects.filter(
@@ -52,6 +64,9 @@ class ListRaffleView(generic.ListView):
         )))
 
         for entry in object_list:
+
+            entry.personA.cleanings = Pairing.objects.all().filter(cleaning_task=True).filter(Q(personA=entry.personA)|Q(personB=entry.personA)).count()
+            entry.personB.cleanings = Pairing.objects.all().filter(cleaning_task=True).filter(Q(personA=entry.personB)|Q(personB=entry.personB)).count()
 
             entry.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=entry.personB).count()
             entry.repeate += Pairing.objects.all().filter(personA=entry.personB, personB=entry.personA).count()

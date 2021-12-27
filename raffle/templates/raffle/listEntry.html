@@ -11,12 +11,14 @@
         <th>Person A</th>
         <th>Person B</th>
         <th>Bisherige Vorkommen</th>
+        <th>Betreuung</th>
     </tr>
     {% for entry in object_list %}
     <tr>
-        <td>{{ entry.personA }}</td>
-        <td>{{ entry.personB }}</td>
+        <td>{{ entry.personA }}{%if showSum == '1' %} ({{ entry.personA.cleanings }}){% endif %}</td>
+        <td>{{ entry.personB }}{%if showSum == '1' %} ({{ entry.personB.cleanings }}){% endif %}</td>
         <td>{{ entry.repeate }}</td>
+        <td>{{ entry.cleaning_task }}</td>
     </tr>
     {% endfor %}
 </table>
