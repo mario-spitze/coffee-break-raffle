@@ -1,3 +1,4 @@
+from ast import Try
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 # Create your views here.
@@ -56,12 +57,23 @@ class ListRaffleView(generic.ListView):
         pk_url_kwarg = "post_id"
         query = self.kwargs['id']
 
+        compareID = -1
+
+        try:
+            print(compareID)
+            compareID = int(self.request.GET.get('compare'))
+        except:
+            None
+
         
 
 #        all_queryset = QuerySet.create(list(chain(Site.objects.all(), Medium.objects.all())))
         object_list.extend(list(Pairing.objects.filter(
                 Q(event=query)
         )))
+
+        if compareID >= 0:
+            object_list[0].comparePerson = Person.objects.get(pk=compareID)
 
         for entry in object_list:
 
@@ -71,6 +83,15 @@ class ListRaffleView(generic.ListView):
             entry.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=entry.personB).count()
             entry.repeate += Pairing.objects.all().filter(personA=entry.personB, personB=entry.personA).count()
             entry.repeate -= 1
+
+            print(compareID)
+
+            if compareID >= 0:
+                entry.personA.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=compareID).count()
+                entry.personA.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personA).count()
+                entry.personB.repeate = Pairing.objects.all().filter(personA=entry.personB, personB=compareID).count()
+                entry.personB.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personB).count()
+                print(entry.personA.repeate)
             print(entry)
 
         return object_list

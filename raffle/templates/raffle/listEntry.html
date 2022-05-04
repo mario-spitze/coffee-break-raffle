@@ -6,11 +6,15 @@
     customers tr:nth-child(even){background-color: #f2f200;};
     customers tr:hover {background-color: #ddd;};
   </style>
+  <a href="{{ build_absolute_uri }}">reset</a>
+  {{ object_list.0.comparePerson }}
 <table border="2">
     <tr>
         <th>Person A</th>
         <th>Person B</th>
         <th>Bisherige Vorkommen</th>
+        <th>Wiederholung mit A</th>
+        <th>Wiederholung mit B</th>
         <th>Betreuung</th>
     </tr>
     {% for entry in object_list %}
@@ -18,7 +22,11 @@
         <td>{{ entry.personA }}{%if showSum == '1' %} ({{ entry.personA.cleanings }}){% endif %}</td>
         <td>{{ entry.personB }}{%if showSum == '1' %} ({{ entry.personB.cleanings }}){% endif %}</td>
         <td>{{ entry.repeate }}</td>
+        <td>{{ entry.personA.repeate }}</td>
+        <td>{{ entry.personB.repeate }}</td>
         <td>{{ entry.cleaning_task }}</td>
+        <td><a href="{{ build_absolute_uri }}?compare={{ entry.personA.id }}">link</a></td>
+        <td><a href="{{ build_absolute_uri }}?compare={{ entry.personB.id }}">link</a></td>
     </tr>
     {% endfor %}
 </table>
