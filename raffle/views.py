@@ -14,6 +14,31 @@ from .models import *
 def index(request):
     return HttpResponseRedirect('/raffle/createRaffle/')
 
+def change(request):
+
+    raffleID = int(request.GET.get('raffleID'))
+    compareID = int(request.GET.get('compare'))
+    comparePerson = Person.objects.get(pk=compareID)
+    changewithID = int(request.GET.get('changewith'))
+    changewithPerson = Person.objects.get(pk=changewithID)
+
+    pairingA = Pairing.objects.filter(Q(personA=compareID) | Q(personB=compareID)).filter(event=raffleID)[0]
+    pairingB = Pairing.objects.filter(Q(personA=changewithID) | Q(personB=changewithID)).filter(event=raffleID)[0]
+
+    if pairingA.personA == compareID:
+        pairingA.personA = changewithPerson
+    else:
+        pairingA.personB = changewithPerson
+
+    if pairingB.personA == changewithID:
+        pairingB.personA = comparePerson
+    else:
+        pairingB.personB = comparePerson
+
+    pairingA.save()
+    pairingB.save()
+
+    return HttpResponseRedirect('/raffle/listRaffle/' + str(raffleID))
 
 def createRaffle(request):
 
@@ -46,34 +71,44 @@ class ListRaffleView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        pkID = self.kwargs['id'] 
+        context['pkID'] = pkID
+
         showSum = self.request.GET.get('showSum')
         if showSum == '1':
             context['showSum'] = '1'
+
+        comparePerson = None
+        try:
+            compareID = int(self.request.GET.get('compare'))
+            if compareID >= 0:
+                comparePerson = Person.objects.get(pk=compareID)
+        except:
+            None
+
+        if comparePerson != None:
+            context['comparePerson'] = comparePerson
+            object_list = context['object_list']
+            for entry in object_list:
+                entry.personA.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=compareID).count()
+                entry.personA.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personA).count()
+                entry.personB.repeate = Pairing.objects.all().filter(personA=entry.personB, personB=compareID).count()
+                entry.personB.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personB).count()
+           
+            context['object_list'] = object_list
+
         return context
         
 
     def get_queryset(self): # new
         object_list = []
         pk_url_kwarg = "post_id"
-        query = self.kwargs['id']
-
-        compareID = -1
-
-        try:
-            print(compareID)
-            compareID = int(self.request.GET.get('compare'))
-        except:
-            None
-
-        
+        query = self.kwargs['id']  
 
 #        all_queryset = QuerySet.create(list(chain(Site.objects.all(), Medium.objects.all())))
         object_list.extend(list(Pairing.objects.filter(
                 Q(event=query)
         )))
-
-        if compareID >= 0:
-            object_list[0].comparePerson = Person.objects.get(pk=compareID)
 
         for entry in object_list:
 
@@ -83,15 +118,5 @@ class ListRaffleView(generic.ListView):
             entry.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=entry.personB).count()
             entry.repeate += Pairing.objects.all().filter(personA=entry.personB, personB=entry.personA).count()
             entry.repeate -= 1
-
-            print(compareID)
-
-            if compareID >= 0:
-                entry.personA.repeate = Pairing.objects.all().filter(personA=entry.personA, personB=compareID).count()
-                entry.personA.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personA).count()
-                entry.personB.repeate = Pairing.objects.all().filter(personA=entry.personB, personB=compareID).count()
-                entry.personB.repeate += Pairing.objects.all().filter(personA=compareID, personB=entry.personB).count()
-                print(entry.personA.repeate)
-            print(entry)
 
         return object_list

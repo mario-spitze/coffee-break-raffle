@@ -7,7 +7,11 @@
     customers tr:hover {background-color: #ddd;};
   </style>
   <a href="{{ build_absolute_uri }}">reset</a>
-  {{ object_list.0.comparePerson }}
+  {{ comparePerson }}
+
+  <form method='post' action='/add-edit-user/'>
+    {% csrf_token %}
+  </form>
 <table border="2">
     <tr>
         <th>Person A</th>
@@ -19,10 +23,16 @@
     </tr>
     {% for entry in object_list %}
     <tr>
-        <td>{{ entry.personA }}{%if showSum == '1' %} ({{ entry.personA.cleanings }}){% endif %}</td>
-        <td>{{ entry.personB }}{%if showSum == '1' %} ({{ entry.personB.cleanings }}){% endif %}</td>
+        <td>{% if comparePerson %}<a href="{% url 'raffle:change' %}?raffleID={{ pkID }}&compare={{ comparePerson.id }}&changewith={{ entry.personA.id }}">{% endif %}
+            {{ entry.personA }}{%if showSum == '1' %} ({{ entry.personA.cleanings }})
+            {% endif %}{% if comparePerson %}</a>{% endif %}
+        </td>
+        <td>{% if comparePerson %}<a href="{% url 'raffle:change' %}?raffleID={{ pkID }}&compare={{ comparePerson.id }}&changewith={{ entry.personB.id }}">{% endif %}
+            {{ entry.personB }}{%if showSum == '1' %} ({{ entry.personB.cleanings }}){% endif %}
+            {% if comparePerson %}</a>{% endif %}
+        </td>
         <td>{{ entry.repeate }}</td>
-        <td>{{ entry.personA.repeate }}</td>
+        <td>{% if comparePerson == entry.personA %} --- {% else %}{{ entry.personA.repeate }}{% endif %}</td>
         <td>{{ entry.personB.repeate }}</td>
         <td>{{ entry.cleaning_task }}</td>
         <td><a href="{{ build_absolute_uri }}?compare={{ entry.personA.id }}">link</a></td>

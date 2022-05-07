@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('createRaffle/', views.createRaffle, name='createRaffle'),
     path('listRaffle/<int:id>', views.ListRaffleView.as_view(), name='listRaffle'),
+    path('change', views.change, name='change'),
 ]
